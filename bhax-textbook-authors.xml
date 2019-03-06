@@ -1,0 +1,26 @@
+<authorgroup xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <author>
+        <personname>
+            <surname>Róka</surname>
+            <firstname>Dávid</firstname>        
+        </personname>    
+        <affiliation>
+            <shortaffil>Egyetemi hallgató, DE.</shortaffil>
+            <jobtitle>Egyetemi hallgató</jobtitle>
+            <orgname>Debreceni Egyetem</orgname>
+            <orgdiv></orgdiv>
+            <address>
+                <email></email>
+            </address>
+        </affiliation>
+        <address>
+            <street>Szent István út 53.</street>
+            <city>Nagykálló</city>
+            <postcode>4320</postcode>
+            <country>Magyarország</country>
+            <otheraddr>
+                <link xlink:href="https://arato.inf.unideb.hu/batfai.norbert/">https://arato.inf.unideb.hu/batfai.norbert/</link>
+            </otheraddr>
+        </address>
+    </author>    
+</authorgroup>
