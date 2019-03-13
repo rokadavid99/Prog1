@@ -144,7 +144,9 @@
             </listitem>
         </orderedlist>
         <para>
-            Megoldás forrása:  
+            Megoldás forrása:<link
+                xlink:href="https://github.com/rokadavid99/Prog1/blob/master/signal.c "/>
+
         </para>
 
         <para>
@@ -262,13 +264,15 @@ $(\exists y \forall x (y<x) \supset \neg (x \text{ prím}))$
 
 
         <para>
-            Megoldás videó: 
+            Megoldás videó: https://github.com/rokadavid99/Prog1/blob/master/deklaracio.c
         </para>
         <para>
-            Megoldás forrása:  
+            Megoldás forrása:<link
+            xlink:href="https://github.com/rokadavid99/Prog1/blob/master/deklaracio.c"/>  
         </para>
         <para>
-            Tanulságok, tapasztalatok, magyarázat...
+            Ennél a feladatnál arra kell vigyázni, hogy a referenciaérték C++ "feature",
+            amit a gcc fordító nem tud értelmezni, ezért a gcc fordító helyett g++-t kell használnunk.
         </para>
     </section>                     
 
