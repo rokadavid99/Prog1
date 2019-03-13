@@ -11,15 +11,77 @@
             Írj olyan C végtelen ciklusokat, amelyek 0 illetve 100 százalékban dolgoztatnak egy magot és egy olyat, amely  
             100 százalékban minden magot!
         </para>
-        <para>
-            Megoldás videó:
+           <para>Egy magot 100%-ban a while illetve a for ciklus alkalmazásával is pörgethetünk.</para>
+        <para><emphasis role="bold">Megoldás while ciklussal:</emphasis><link
+                xlink:href="https://github.com/rokadavid99/Prog1/blob/master/loopw.c"
+            /><programlisting>#include &lt;stdio.h>
+int main(){
+    
+    while(1);
+
+    return 0;
+}
+
+		</programlisting></para>
+        <para>A két megoldás közül ez az egyszerűbb, mondhatni stílusosabb.</para>
+        <para/>
+        <para><emphasis role="bold">Megoldás for ciklussal:</emphasis><link
+                xlink:href="https://github.com/rokadavid99/Prog1/blob/master/loopf.c"
+            /><programlisting>#include &lt;stdio.h>
+
+
+int main(){
+    for(;;);
+
+    return 0;
+
+
+}
+</programlisting></para>
+        <para>Viszont ez a megoldás egyértelművé teszi a program megértését a két db ";;" jel miatt, ami kifejezi a szándékunkat.</para>
+        <para><emphasis role="bold">Több mag 100%-on:</emphasis><link
+                xlink:href="https://github.com/rokadavid99/Prog1/blob/master/allcore100.c"
+            /><programlisting>#include &lt;stdio.h>
+#include &lt;unistd.h>
+#include &lt;omp.h>
+
+int main(){
+
+#pragma omp parallel
+#pragma omp while
+
+	while(1){
+
+	}	
+return 0;
+}</programlisting></para>
+        <para>Ahhoz, hogy több magot 100%-on tudjunk futtatni, a parallel pragma-t kell fehasználnunk,
+              ami az őt követő utasításokat több szálon futtatja.Nem szabad figyelmen kívűl hagyni,
+              hogy a kód elején meg kell hívnunk az omp.h headert. 
         </para>
+        <para><emphasis role="bold">Egy mag 0%-on:</emphasis><link
+                xlink:href="https://github.com/rokadavid99/Prog1/blob/master/loop0.c"
+            /></para>
         <para>
-            Megoldás forrása:                
+            <programlisting>#include &lt;stdio.h>
+#include &lt;unistd.h>
+
+
+int main(){
+
+    while(1){
+
+    sleep(100);
+   
+     }
+    return 0;
+
+}</programlisting>
         </para>
-        <para>
-            Tanulságok, tapasztalatok, magyarázat...
+        <para>Amikor egy magot szeretnénk használni és azt is 0%-on, akkor azt a sleep függvény segítségével
+             tehetjük meg. A sleep függvény használatához meg kell hívni az unistd.h headert.
         </para>            
+
     </section>        
         
     <section>
@@ -133,10 +195,7 @@ false]]></screen>
             pattogtatás alatt, alább láthatod a videókon.)
         </para>
         <para>
-            Megoldás videó: <link xlink:href="https://bhaxor.blog.hu/2018/08/28/labdapattogas">https://bhaxor.blog.hu/2018/08/28/labdapattogas</link>
-        </para>
-        <para>
-            Megoldás forrása:  
+            Megoldás videó: <link xlink:href="https://github.com/rokadavid99/Prog1/blob/master/labda.c">https://github.com/rokadavid99/Prog1/blob/master/labda.c</link>
         </para>
         <para>
             Tanulságok, tapasztalatok, magyarázat...
@@ -170,7 +229,7 @@ false]]></screen>
             Megoldás videó: <link xlink:href=""></link>
         </para>
         <para>
-            Megoldás forrása: <link xlink:href=""></link>
+            Megoldás forrása: <link xlink:href="https://github.com/rokadavid99/Prog1/blob/master/pagerank.c"></link>
         </para>
         <para>
             Tanulságok, tapasztalatok, magyarázat...
