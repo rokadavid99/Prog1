@@ -2,13 +2,10 @@
 #include <unistd.h>
 #include <omp.h>
 
-int main(){
-
-#pragma omp parallel
-#pragma omp while
-
-	while(1){
-
-	}	
-return 0;
-		}
+ int main (){
+	   #pragma omp parallel 
+  	    {                 
+  	    for (;;);         
+  	    }
+  	   return 0;
+ 	   }
