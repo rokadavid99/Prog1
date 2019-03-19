@@ -2,57 +2,56 @@
 #include <math.h>
 
 void kiir (double tomb[], int db)
+  {
+  
+  int i;
+  for (i=0; i<db; i++)
+  printf("PageRank [%d]: %lf\n", i, tomb[i]);
+  
+  }
+
+double tavolsag(double pagerank[],double pagerank_temp[],int db)
 {
-		for (int i=0; i<db; i++) {
-		printf("PageRank [%d]: %lf\n", i, tomb[i]);
-	}
-}
-	
-double tavolsag (double PR[], double PRv[], int n){
 double tav = 0.0;
-
-	for(int i=0; i<n; i++) {
-		tav += (PR[i] - PRv[i]) * (PR[i] - PRv[i]);
-	}
-
-return sqrt(tav);
+int i;
+for(i=0;i<db;i++)
+tav +=abs(pagerank[i] - pagerank_temp[i]);
+return tav;
 }
 
-int main (void){
-double L[4][4]={
-	       {0.0, 0.0, 1.0 / 3.0, 0.0},
-               {1.0, 1.0 / 2.0, 1.0 / 3.0, 1.0},
-	       {0.0, 1.0 / 2.0, 0.0, 0.0},
-	       {0.0, 0.0, 1.0 / 3.0, 0.0}
-};
+int main(void)
+{
+  double L[4][4] = {
+  {0.0, 0.0, 1.0 / 3.0, 0.0},
+  {1.0, 1.0 / 2.0, 1.0 / 3.0, 1.0},
+  {0.0, 1.0 / 2.0, 0.0, 0.0},
+  {0.0, 0.0, 1.0 / 3.0, 0.0}
+  };
 
-	double PR[4] = { 0.0, 0.0, 0.0, 0.0};
-	double PRv[4] = {1.0 / 4.0, 1.0 / 4.0, 1.0 / 4.0, 1.0 / 4.0 };
-	
-	int i, j;
+  double PR[4] = {0.0, 0.0, 0.0, 0.0};
+  double PRv[4] = {1.0 / 4.0, 1.0 / 4.0, 1.0 / 4.0, 1.0 / 4.0};
 
-	for (;;) {
-		for(int i=0; i<4; i++) {
-			PR[i] = PRv[i];
-		}
+  int i,j;
 
-		for (int i=0; i<4; i++) {
-			double tmp = 0.0;
 
-			for (int j=0; j<4; j++) {
-				tmp += L[i][j] * PR[j];
-				PRv[i] = tmp;
-			}
-		}
+  for (;;)
+  {
 
-		
-if (tavolsag (PR, PRv, 4) < 0.0000000001){
-	break;
-	}
-		}
+  for (i=0;i<4;i++)
+    {
+    PR[i]=0.0;
+    for (j=0;j<4;j++)
+      PR[i]+=L[i][j]*PRv[j];
+    }
 
-	kiir(PR, 4);
+    if ( tavolsag(PR,PRv, 4) < 0.0000001)
+    break;
+  
+    for(i=0;i<4;i++)
+      PRv[i] = PR[i];
+  
+  }
+  kiir (PR,4);
+  return 0;
 
-	return 0;
-}
-
+} 
