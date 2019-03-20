@@ -10,14 +10,40 @@
         <para>
             Állapotátmenet gráfjával megadva írd meg ezt a gépet!
         </para>
-        <para>
-            Megoldás videó:
+         <para>
+            Megoldás forrása:<link xlink:href="https://github.com/rokadavid99/Prog1/blob/master/turing.c"/>            
         </para>
+       <programlisting language="c"><![CDATA[
+#include <stdio.h>
+
+int 
+main()
+{
+	int a, db=0;
+	printf("Adj meg egy decimalis szamot!\n");
+	scanf("%d", &a);
+	printf("Atvaltva unarisba:\n");
+	for (int i = 0; i < a; i++)
+	{
+		printf("|");
+		db++;
+		if (db % 5 == 0) 
+                {
+                printf(" ");
+                }
+	}
+	printf("\n");
+	return 0;
+}
+           
+            ]]> 
+            </programlisting>    
         <para>
-            Megoldás forrása:                
-        </para>
-        <para>
-            Tanulságok, tapasztalatok, magyarázat...
+           Jó ha tisztázzuk, a feladatban szereplő fogalmakat. A Turing gépről már volt szó.(lásd: Hello, Truing! 2.2) 
+            A decimális számrendszer a tizes számrendszert jelenti, középsuliban ebben számoltunk a legtöbbet.
+            Az unáris számrendszer pedig az egyes számrendszert jelenti, ami talán a legegyszerűbb az összes számrendszer közül. 
+            Lényege, hogy a természetes számokat megfelelő mennyiségű szimbólummal ábrázoljuk, esetünkben ez a "|".
+
         </para>
     </section>        
         
@@ -26,15 +52,84 @@
         <para>
             Mutass be legalább két környezetfüggő generatív grammatikát, amely ezt a nyelvet generálja!
         </para>
+                <para>
+         A generatív grammatika fogalma Noam Chomsky, amerikai nyelvész professzor nevéhez fűződik.
+            Négy alkotóeleme van a generatív grammatikának: terminális szimbólumok, nem terminális jelek, kezdőszimbólum ill. helyettesítési szabályok.
+            A grammatikákat osztályozással különíthetjük el egymástól. Ezek szerint lehet: általános (0-s típusú), környezetfüggő (1-es típusú), környezetffügetlen (2-es típusú) és reguláris (3-as típusú).
+            A feladat szövegében a környezetfüggő (1-es típusú) osztály van említve. Itt a képzési szabály bal, illetve jobb oldalán is szerepelhetnek terminális szimbólumok. (környezetfüggetlen grammatikák esetén a bal oldalon csak nemterminális szimbólum lehet)
+
+        </para>
+<programlisting><![CDATA[
+S, X, Y "változók" - ezek nemterminálisok
+a, b, c "konstansok" - ezek terminálisok
+S -> abc, S -> aXbc, Xb -> bX, Xc -> Ybcc, bY -> Yb, aY -> aaX, aY -> aa - ezek a képzési szabályok
+S lesz a kezdőszimbólum
+Ha jól alkalmazzuk a képzési szabályainkat, akkor ezt kapjuk: 
+                        
+                S (S -> aXbc)
+                aXbc (Xb -> bX)
+                abXc (Xc -> Ybcc)
+                abYbcc (bY -> Yb)
+                aYbbcc (aY - aa)
+                aabbcc
+                    
+------------------------------------------------------------------
+A nyilak segítségével tudjuk jelölni a képzési szabályt. (miből -> mi lesz)
+Ugyanezen nyelv egy másik reprezentációja: 
+                                              
+                S (S -> aXbc)
+                aXbc (Xb -> bX)
+                abXc (Xc -> Ybcc)
+                abYbcc (bY -> Yb)
+                aYbbcc (aY -> aaX)
+                aaXbbcc (Xb -> bX)
+                aabXbcc (Xb -> bX)
+                aabbXcc (Xc -> Ybcc)
+                aabbYbccc (bY -> Yb)
+                aabYbbccc (bY -> Yb)
+                aaYbbbccc (aY -> aa)
+                aaabbbccc]]>
+            </programlisting>
+
         <para>
-            Megoldás videó:
+           Onnan tudhatjuk, hogy ez a grammatika környezetfüggő, hogy a képzési szabályokban van olyan, ahol a nyíl bal oldalán is láthatunk terminális szimbólumot.
+                Fentebb már említettem, most nyomatékosítom, hogy ez egy környezetfüggetlen nyelvben nem létezik.                
         </para>
         <para>
-            Megoldás forrása:                
+        Másik környezetfüggő grammatika:
         </para>
-        <para>
-            Tanulságok, tapasztalatok, magyarázat...
-        </para>
+        <programlisting><![CDATA[
+A, B, C "változók" - ezek nemterminálisok
+a, b, c "konstansok" - ezek terminálisok
+A -> aAB, A -> aC, CB -> bCc, cB -> Bc, C -> bc - ezek a képzési szabályok
+A lesz a kezdőszimbólum
+Ha jól alkalmazzuk a képzési szabályainkat, akkor ezt kapjuk: 
+                
+                A (A -> aAB)
+                aAB (A -> aC)
+                aaCB (CB -> bCc)
+                aabCc (C -> bc)
+                aabbcc
+
+------------------------------------------------------------------
+Ugyanezen nyelv egy másik reprezentációja: 
+                
+                A (A -> aAB)
+                aAB (A -> aAB)
+                aaABB (A -> aAB)
+                aaaABBB (A -> aC)
+                aaaaCBBB (CB -> bCc)
+                aaaabCcBB (cB -> Bc)
+                aaaabCBcB (cB -> Bc)
+                aaaabCBBc (CB -> bCc)
+                aaaabbCcBc (cB -> Bc)
+                aaaabbCBcc (CB -> bCc)
+                aaaabbbCccc (C -> bc)
+                aaaabbbbcccc]]>
+            </programlisting>
+            <para>
+                Nagyban hasonlít a két nyelvtan, csak a változókat és a képzési szabályokat írtam át, mégis egy másik környezetfüggő generatív nyelvet kaptunk.
+            </para>
     </section>        
                 
     <section>
@@ -45,13 +140,81 @@
             Majd mutass be olyan kódcsipeteket, amelyek adott szabvánnyal nem fordulnak (például C89), mással (például C99) igen.
         </para>
         <para>
-            Megoldás videó: 
+        Először is hogy megértsük meg kell adnunk a származtatási szabályok halamzát:
         </para>
+<programlisting>
+<![CDATA[
+<utasítás> ::= <kifejezés> | <összetett_utasítás> | <feltételes_utasítás> | <while_utasítás> | <do_utasítás> | <for_utasítás> | <switch_utasítás> | <break_utasítás> | <continue_utasítás> | <return_utasítás> | <goto_utasítás> | <cimke_utasítás> | <nulla_utasítás>
+
+<kifejezés> ::= <értékadás> | <függvényhívás>
+<értékadás> ::= <változó><szám>
+<változó> ::= <betű>{<betű>}
+<betű> ::= a-z
+<szám> ::= <számjegy>{<számjegy>}
+<számjegy> ::= 0|1|2|3|4|5|6|7|8|9
+<függvényhívás> ::= <típus><függvénynév>
+<típus> ::= <betű>{<betű>}
+<függvénynév> ::= <betű>{<betű>}
+
+<összetett_utasítás> ::= <deklarációlista> | <utasításlista>
+<deklarációlista> ::= <deklaráció>{<deklaráció>}
+<deklaráció> ::= <típus><változó>
+<utasításlista> ::= <utasítás>{<utasítás>}
+
+<feltételes_utasítás> ::= if<kifejezés><utasítás> | if<kifejezés><utasítás>else<utasítás>
+
+<break_utasítás> ::= break
+
+<while_utasítás> ::= while<kifejezés><utasítás> | while<kifejezés><utasítás><break_utasítás>
+
+<do_utasítás> ::= do<utasítás>while<kifejezés> | do<utasítás>while<kifejezés><break_utasítás>
+
+<for_utasítás> ::= for([<kifejezés>][<kifejezés>][<kifejezés>])<utasítás> | for([<kifejezés>][<kifejezés>][<kifejezés>])<utasítás><break_utasítás>
+
+<switch_utasítás> ::= switch<kifejezés><utasítás> | switch<kifejezés><utasítás><case><kifejezés><default> | switch<kifejezés><utasítás><break_utasítás>
+
+<continue_utasítás> ::= continue
+
+<return_utasítás> ::= return | return<kifejezés>
+
+<goto_utasítás> ::= goto<azonosító>
+
+<cimke_utasítás> ::= <azonosító>
+<azonosító> ::= <cimke>
+<cimke> ::= <betű>{<betű>}
+
+<nulla_utasítás> ::= ]]> 
+        </programlisting>
+        <para>
+            A BNF a rövidítése a Backus-Naur formának, ami egy szintaxis a környezet-független nyelvtanok leírására.
+            Működéséhez szükség van a származtatási szabályok halmazára. Ezt az előbb adtam meg.
+        </para>
+         <programlisting language="c">
+<![CDATA[
+#include<stdio.h>
+
+int main()
+{
+    int y;
+    for (int a = 0; a < 10; a++) 
+    {   
+        y=a*2;
+        printf("%d \n", y);
+    }
+
+    return 0;
+}
+
+]]> 
+        </programlisting>
+
         <para>
             Megoldás forrása:  
         </para>
         <para>
-            Tanulságok, tapasztalatok, magyarázat...
+         Láthatjuk, hogy a C89-es nem tudja lefordítani azokat a kódot, ahol a for ciklus kezdetén deklarálni akarunk.
+            Tehát, a fordítónk hibát jelzett, viszont megmondta, hogy milyen fordítót használjunk, ha azt szeretnénk, hogy a program működjön.("loop initial declarations are only allowed in C99 or C11 mode")
+
         </para>
     </section>                     
 
@@ -63,8 +226,47 @@
             a feladat lényege, hogy lexert használjunk, azaz óriások vállán álljunk és ne kispályázzunk!
         </para>
         <para>
-            Megoldás videó: 
+        A Flex segítségével lehet, egy megadott kód alapján lexikális elemzőt generálni C-ben.
+            Tehát, magát a C programot nem mi fogjuk megírni, hanem a lexer. 
+            Az ".l" kiterjesztésű fájlok fordítása más, mint például a ".c"-jé.
+            Először az alábbi sorra van szükségünk:
+ 
         </para>
+        <programlisting language="tex"><![CDATA[
+lex -o realnumber.c realnumber.l
+]]>     
+        </programlisting>
+        <para>
+            Majd, a már jól ismert gcc jön egy kis kiegészítéssel, amire a linkelés miatt van szükség:
+        </para>
+        <programlisting language="tex"><![CDATA[
+gcc realnumber.c -o realnumber -lfl
+]]></programlisting>
+        <para>
+            Maga a kód pedig így néz ki:
+        </para>
+                <programlisting language="tex">
+<![CDATA[
+%{
+#include <stdio.h>
+int realnumbers = 0;
+%}
+digit	[0-9]
+%%
+{digit}*(\.{digit}+)?	{++realnumbers; 
+    printf("[realnum=%s %f]", yytext, atof(yytext));}
+%%
+int
+main ()
+{
+ yylex ();
+ printf("The number of real numbers is %d\n", realnumbers);
+ return 0;
+}
+]]> 
+        </programlisting>
+
+
         <para>
             Megoldás forrása:  
         </para>
@@ -78,14 +280,121 @@
         <para>
             Lexelj össze egy l33t ciphert!
         </para>
-        <para>
-            Megoldás videó: 
+       <para>
+            A leet(l33t vagy 1337) egy olyan eljárás, amiben az írott szöveg betűit, főleg számokkal, de akár más ASCII karakterekkel is helyettesítik.
+            A könnyebb megértés érdekében itt van egy példa.           
         </para>
+<programlisting language="c">
+<![CDATA[
+%{
+  #include <stdio.h>
+  #include <stdlib.h>
+  #include <time.h>
+  #include <ctype.h>
+
+  #define L337SIZE (sizeof l337d1c7 / sizeof (struct cipher))
+    
+  struct cipher {
+    char c;
+    char *leet[4];
+  } l337d1c7 [] = {
+
+  {'a', {"4", "4", "@", "/-\\"}},
+  {'b', {"b", "8", "|3", "|}"}},
+  {'c', {"c", "(", "<", "{"}},
+  {'d', {"d", "|)", "|]", "|}"}},
+  {'e', {"3", "3", "3", "3"}},
+  {'f', {"f", "|=", "ph", "|#"}},
+  {'g', {"g", "6", "[", "[+"}},
+  {'h', {"h", "4", "|-|", "[-]"}},
+  {'i', {"1", "1", "|", "!"}},
+  {'j', {"j", "7", "_|", "_/"}},
+  {'k', {"k", "|<", "1<", "|{"}},
+  {'l', {"l", "1", "|", "|_"}},
+  {'m', {"m", "44", "(V)", "|\\/|"}},
+  {'n', {"n", "|\\|", "/\\/", "/V"}},
+  {'o', {"0", "0", "()", "[]"}},
+  {'p', {"p", "/o", "|D", "|o"}},
+  {'q', {"q", "9", "O_", "(,)"}},
+  {'r', {"r", "12", "12", "|2"}},
+  {'s', {"s", "5", "$", "$"}},
+  {'t', {"t", "7", "7", "'|'"}},
+  {'u', {"u", "|_|", "(_)", "[_]"}},
+  {'v', {"v", "\\/", "\\/", "\\/"}},
+  {'w', {"w", "VV", "\\/\\/", "(/\\)"}},
+  {'x', {"x", "%", ")(", ")("}},
+  {'y', {"y", "", "", ""}},
+  {'z', {"z", "2", "7_", ">_"}},
+  
+  {'0', {"D", "0", "D", "0"}},
+  {'1', {"I", "I", "L", "L"}},
+  {'2', {"Z", "Z", "Z", "e"}},
+  {'3', {"E", "E", "E", "E"}},
+  {'4', {"h", "h", "A", "A"}},
+  {'5', {"S", "S", "S", "S"}},
+  {'6', {"b", "b", "G", "G"}},
+  {'7', {"T", "T", "j", "j"}},
+  {'8', {"X", "X", "X", "X"}},
+  {'9', {"g", "g", "j", "j"}}
+  
+// https://simple.wikipedia.org/wiki/Leet
+  };
+  
+%}
+%%
+.	{
+	  
+	  int found = 0;
+	  for(int i=0; i<L337SIZE; ++i)
+	  {
+	  
+	    if(l337d1c7[i].c == tolower(*yytext))
+	    {
+	    
+	      int r = 1+(int) (100.0*rand()/(RAND_MAX+1.0));
+	    
+          if(r<91)
+	        printf("%s", l337d1c7[i].leet[0]);
+          else if(r<95)
+	        printf("%s", l337d1c7[i].leet[1]);
+	      else if(r<98)
+	        printf("%s", l337d1c7[i].leet[2]);
+	      else 
+	        printf("%s", l337d1c7[i].leet[3]);
+
+	      found = 1;
+	      break;
+	    }
+	    
+	  }
+	  
+	  if(!found)
+	     printf("%c", *yytext);	  
+	  
+	}
+%%
+int 
+main()
+{
+  srand(time(NULL)+getpid());
+  yylex();
+  return 0;
+}
+]]> 
+        </programlisting>       
+
         <para>
             Megoldás forrása:  
         </para>
         <para>
-            Tanulságok, tapasztalatok, magyarázat...
+             A kód elején lévő <function>#define</function>-os rész arra szolgál, hogy ha hivatkozunk a <function>L337SIZE</function>-ra, akkor azt helyettesíteni fogja a mellette lévő értékkel.
+            Majd létrehozunk egy struktúrát, ami alapján deklaráljuk a <function>l337d1c7 []</function> tömböt.
+            Ez a tömb kulcsszerepet fog játszani a programunkban, ugyanis ez tartalmazza a karaktereket és a hozzájuk tartozó helyettesítő karaktereket is. (alatta láthatjuk, hogy mik ezek)
+            A <function>tolower()</function> függvény a nagybetűket kicsivé alakítja át.
+            Majd generálunk egy random számot 1 és 100 között. Az if-es részben vizsgáljuk, hogy ha a kapott random szám kisebb, mint 91 akkor a <function>char *leet[4]</function> tömb első elemét írjuk ki, ha nem akkor meg haladunk tovább az else ágakon a kód szerint.
+            A <function>found</function> arra szolgál, hogy megnézze, hogy a beolvasott karakter benne van-e tömbünkben.
+            A program legvégén érkezünk el csak a main()-hez. Itt a(z) <function>yylex()</function> függvénnyel indítjuk el a lexikális elemzést.
+
         </para>
     </section>                     
 
@@ -181,8 +490,36 @@ $(\exists y \forall x (y<x) \supset \neg (x \text{ prím}))$
         </para>
 
         <para>
-            Tanulságok, tapasztalatok, magyarázat...
+            Ehhez a feladathoz szükségünk van a LaTex-re, ami egy igen hasznos, ám kevésbé elterjedt szövegszerkesztő.
+            A feladatban szereplő parancsok, sokak számára furcsának tűnhetnek elsőre, de nem kell megijedni, mert a mi drága szövegszerkesztőnk ezekből a parancsokból értelmes matematikai kifejezéseket csinál.
+            Sőt, amikor futtatunk egy ilyen szerkesztőt (pl.: TeXworks), akkor egy pdf fájlt is kapunk, ahol szépen olvasható módon látjuk az eredményt.
         </para>
+        <programlisting language="tex"><![CDATA[
+\documentclass{article}
+\usepackage[magyar]{babel}
+\usepackage[utf8]{inputenc}
+\usepackage{amsmath}
+
+\begin{document}
+
+$$1.$$
+$(\forall x\exists y((x<y)\wedge(y\textbf{ prím})))$
+A prímszámok száma végtelen.
+$$2.$$
+$(\forall x\exists y((x<y)\wedge(y\textbf{ prím})\wedge(SSy\textbf{ prím})))$
+Az ikerprímek száma végtelen.
+$$3.$$
+$(\exists y\forall x(x\textbf{ prím})\supset(x<y))$
+A prímszámok száma véges.
+$$4.$$
+$(\exists y\forall x(y<x)\supset\neg(x\textbf{ prím}))$
+A prímszámok száma végtelen.
+
+
+
+\end{document}
+]]></programlisting>
+
     </section>                                                                                                                                                                            
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     
     <section>
@@ -261,11 +598,22 @@ $(\exists y \forall x (y<x) \supset \neg (x \text{ prím}))$
                 <programlisting><![CDATA[int (*(*z) (int)) (int, int);]]></programlisting>            
             </listitem>            
         </itemizedlist>       
+ <programlisting language="tex"><![CDATA[
+int main(){
+    int a;
+    int *b = &a;
+    int &r = a;
+    int c[5];
+    int (&tr)[5] = c;
+    int *d[5];
+    int *h ();
+    int *(*l) ();
+    int (*v (int c)) (int a, int b);
+    int (*(*z) (int)) (int, int);
 
-
-        <para>
-            Megoldás videó: https://github.com/rokadavid99/Prog1/blob/master/deklaracio.c
-        </para>
+    return 0;
+}
+]]></programlisting>
         <para>
             Megoldás forrása:<link
             xlink:href="https://github.com/rokadavid99/Prog1/blob/master/deklaracio.c"/>  
