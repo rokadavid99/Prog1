@@ -1,0 +1,172 @@
+<chapter xmlns="http://docbook.org/ns/docbook" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:xi="http://www.w3.org/2001/XInclude" version="5.0" xml:lang="hu">
+    <info>
+        <title>Helló, Gutenberg!</title>
+        <keywordset>
+            <keyword/>
+        </keywordset>
+        <cover>
+            <para>
+                Programozás tankönyvek rövid olvasónaplói.
+            </para>
+        </cover>
+    </info>
+    <section>
+        <title>Programozási alapfogalmak</title>
+        <para>         
+            PICI könyv (15-46.o)     
+        </para>
+        <para>
+            ”... De bármely nyelven programozni megtanulni elméletben, „papíron”
+             nem lehet. Ehhez sok-sok programot kell megírni és lefuttatni! ...”
+        </para>
+        <para>
+            Ez a könyvből kiragadott mondat, akár a mottója is lehetne az programozás könyvünknek. Bár
+            jelen pillanatban még a programozási karrierem igen kezdetleges, már most érzékelem, hogy
+            csak úgy lehet fejlődni, ha rengeteg programot írunk és futtatunk.
+        </para>
+        <para>
+            A feladott olvasandó rész első néhány oldala tisztáz néhány alapvető fogalmat, valamint
+            leírja, hogy hogyan is épül fel egy program. Szóesik a COBOL magasszintű programozási
+            nyelvről (COmmon Business Oriented Language), továbbá a Fortran programozási nyelvről
+            is, ami a The IBM Mathematical Formula Translating System névből jön, de természetesen
+            nem maradhat ki a Pascal, az Ada, a PL/I, és a C nyelv sem. A könyvben szó esik az ezen
+            programnyelvek közti különbségekről, illetve hasonlóságokról, valamit a különböző program
+            nyelvek szintaktikájáról és szemantikájáról is.
+        </para>
+        <para>
+            A 28. oldalon az adattípusokról olvashatunk, ami az absztrakció első megjelenési formája a
+            programozási nyelvekben. Egy adattípust három dolog határoz meg, ezek:
+        </para>
+        <para>
+            • tartomány
+        </para>
+        <para>
+            • műveletek
+        </para>
+        <para>
+            • reprezentáció
+        </para>
+        <para>
+            A könyv részletezi az egyszerű, az összetett és a mutató típusokat is. Ez utóbbi lényegében
+            egy egyszerű típus, a különbség az annyi, hogy a tartományának elemei tárcímek.
+            Említést kell tennünk továbbá a nevesített konstansokról is, ami olyan programozási eszköz,
+            amelynek három komponense van: a név, a típus, és az érték. A nevesített konstanst mindig
+            deklarálni kell.
+        </para>
+        <para>
+            A 35. oldalon elértünk a változókhoz. A változó egy olyan programozási eszköz, melynek 4
+            komponense van: név, attribútumok, cím és érték. Változókkal a későbbiekben is rengetegszer
+            fogunk találkozni, mivel az egyik legalapvetőbb elemei a kódoknak.
+        </para>
+        
+    </section> 
+           
+    <section>
+        <title>Programozás bevezetés</title>
+        <para>                
+            KERNIGHANRITCHIE (13-43.o)
+        </para>
+        <para>
+            Megoldás videó(1): <link xlink:href="https://youtu.be/zmfT9miB-jY">https://youtu.be/zmfT9miB-jY</link>
+        </para>
+        <para>
+            Megoldás videó(2): <link xlink:href="https://www.youtube.com/watch?v=rueohIYiNes">https://www.youtube.com/watch?v=rueohIYiNes</link>
+        </para>
+        <para>
+            Ez a könyv alapvetően nem úgy zusammen az összes programozási nyelvről szól, hanem magáról a C nyelvről.
+            A programozók közt alapműnek tekintett KR könyv első néhány bevezető oldala után jutunk el az Alapismeretek című fejezethez.
+            Az olvasóknah minél hamarabb kell eljutniuk egy olyan szintre, ahol már használható programokat tudnak írni.
+            Ezért is fontos még az elején az alapvető dolgokat tisztázni, mint például, hogy mik azok a változók, az állandók, a függvények stb.
+        </para>    
+        <para>
+            Az 1.1-es Indulás című fejezetben találkozunk a könyv első programjával.
+            Ez egy végtelenül egyszerű kód, annyit csinál, hogy kiírja a standard outputra azt, hogy "figyelem emberek!".
+            Így néz ki:
+        </para>
+        <programlisting language='c'>
+<![CDATA[#include <stdio.h>
+
+int
+main ()
+{
+    printf ("Figyelem, emberek! \ n");
+}       
+]]>     </programlisting>
+        <para>
+            A továbbiakban elmagyarázza a könyv ebben a fejezetben, hogy hogyan kell fordítani illetve futtatni a programokat.
+        </para>
+        <para>
+            A következő fejezet a változókról és az aritmetikáról szól. Szó esik a komment használatról és a deklarációról is.
+            Megtudjuk, hogy milyen változó az int, a float, a char, a short, a long és a double. Az első ciklusunkat is ebben a fejezetben vezeti be a könyv. (while())
+            Majd az 1.3-as rész, bevezeti a for utasítást is.
+        </para>
+        <para>
+            A könyvben szó esik még arról, hogy mik azok a szimbolikus állandók, illetve hogy hogyan kell használni őket. 
+            Majd láthatunk néhány hasznos programot, amikból új dolgokat tanulhatunk.(pl.: getchar() és putchar())
+            A karakterszámlálást is ide lehet venni, ahol megtanuljuk a ++ jelet, ami azt jelenti, hogy inkrementálj eggyel.
+            Ez lényegében ugyanazt jelenti mintha azt írnánk, hogy a=a+1. (Létezik dekrementáció is: --)
+        </para>
+        <para>
+            Szó esik továbbá a VAGY, valamint a ÉS operátorokról is. Az 1.6-os fejezetben érkezünk el a tömbhöz, ami lehetővé teszi az összetartozó adatok tárolását.(A leggyakoribb tömbtípus a karaktertömb, amiről az 1.9-es fejezetben részletes leírást kapunk)
+            Fontos témakör továbbá a függvények (hasonló fogalom a szubrutin) és az argumentumok (más néven paraméter) témakörei is.
+            Végül az Érvényességi tartományról és a külső változókról esik szó.
+        </para>
+        <para>
+            Ebben a fejezetben megnéztük a C nyelv legfontosabb elemeit. A könyvben kiváló gyakorló feladatok vannak, ajánlom őket kipróbálásra.
+            Hiszen, ahogy már azt korábban is mondtam, leginkább úgy lehet fejlődni a programozásban, ha minél több programot ír és lát az ember.
+        </para>
+        <para>
+            A következő fejezetben a típusokról, az operátorokról és a kifejezésekről lesz szó.
+        </para>
+    </section> 
+          
+    <section>
+        <title>Programozás</title>
+        <para>                
+            <citation>BMECPP</citation> 
+        </para>
+        <para>                
+            BMECPP (3-16.o)
+        </para>
+        <para>
+            Ez a könyv a C++ programozási nyelvvel foglalkozik, ami a C-nek a továbbfejlesztése.
+            Ebben a fejezetben szó esik az előbb említett két programnyelv különbségeiről.
+        </para>
+        <para>
+            A fejezet első részében függvényparaméterek és  a visszatérési érték különbségeiről van szó a C és C++ nyelvben.
+            Ha nem adunk paramétert akkor a C++ úgy viselkedik, mintha paraméterül a void típust adtuk volna, ezzel szemben ha C-ben nem adunk meg paramétert, akkor bármennyi paramétert használhatunk.
+        </para>
+        <para>
+            A következő részből megtudjuk, hogy C++-ban a <function>main()</function> függvény kétféle lehet és érdekesség, hogy itt nem kötelező a <function>return</function> használata. (alapértelmezett: return 0;)
+            Ebben a nyelvben bevezették a bool típust is. (True vagy False, azaz igaz vagy hamis értéket vehet fel)
+        </para>
+        <programlisting language='c'>
+<![CDATA[#include <stdio.h>
+int main()
+{
+    ...
+}
+
+]]>     </programlisting>
+        <programlisting language='c'>
+<![CDATA[#include <stdio.h>
+int main(int argc, char* argv[])
+{
+    ...
+}
+
+]]>     </programlisting>
+        <para>
+            Érdekes az is, hogy itt deklarálhatunk változót a <function>for</function> ciklus fejrészében is, de erre a for-on kívül nem hivatkozhatunk.
+            A 2.2-es fejezet a függvények túlterheléséről szól. C-ben nem lehet azonos nevű függvényeket megadni, de mivel a C++ a függvényeket a név mellett az argumentumok listájával is azonosítja, ezért itt lehet azonos nevű függvényeket megadni.
+        </para>
+        <para>
+            Továbbá a C++ nagy újításai közé tartozik a referencia típus bevezetése is.
+            Ezen a ponton tisztáznunk kell a pointer (mutató) és a referencia közötti különbséget. A pointer: a számítási memóriában tárolt objektum memóriacíme.
+            A referencia: alternatív azonosító egy objektum számára. A könyv a témát sokkal jobban kifejti a 2.4-es Paratméterátadás referenciatípussal című részben.
+        </para>
+        <para>
+            A következő fejezetben az objektumokról és az osztályokról lesz szó.
+        </para>
+    </section>        
+</chapter>                
