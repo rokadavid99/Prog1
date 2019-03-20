@@ -10,15 +10,99 @@
         <para>
            
         </para>
-        <para>
-            Megoldás videó:
+       <para>
+            Mielőtt nekiugranánk a feladatnak, tisztáznunk kell, hogy mi is az a háromszögmátrix.
+            A háromszögmátrix olyan kvadratikus, azaz négyzetes mátrix (kvadratikus mátrix: olyan mátrix, amelyben a sorainak és oszlopainak a száma megegyezik), melynek a főátlója alatt, vagy felett csupa nulla szerepel. 
+            Ez utóbbit onnan tudjuk meg, hogy alsó vagy felső háromszögmátrixról van-e szó. Jelen esetben a programunkban a főátló felett van kinullázva a mátrix.
         </para>
+ <programlisting language="c"><![CDATA[
+#include <stdio.h>
+#include <stdlib.h>
+
+int
+main ()
+{
+    int nr = 5;
+    double **tm;
+    
+    printf("%p\n", &tm);
+    
+    if ((tm = (double **) malloc (nr * sizeof (double *))) == NULL)
+    {
+        return -1;
+    }
+
+    printf("%p\n", tm);
+    
+    for (int i = 0; i < nr; ++i)
+    {
+        if ((tm[i] = (double *) malloc ((i + 1) * sizeof (double))) == NULL)
+        {
+            return -1;
+        }
+
+    }
+
+    printf("%p\n", tm[0]);    
+    
+    for (int i = 0; i < nr; ++i)
+        for (int j = 0; j < i + 1; ++j)
+            tm[i][j] = i * (i + 1) / 2 + j;
+
+    for (int i = 0; i < nr; ++i)
+    {
+        for (int j = 0; j < i + 1; ++j)
+            printf ("%f, ", tm[i][j]);
+        printf ("\n");
+    }
+
+    tm[3][0] = 42.0;
+    (*(tm + 3))[1] = 43.0;	// mi van, ha itt hiányzik a külső ()
+    *(tm[3] + 2) = 44.0;
+    *(*(tm + 3) + 3) = 45.0;
+
+    for (int i = 0; i < nr; ++i)
+    {
+        for (int j = 0; j < i + 1; ++j)
+            printf ("%f, ", tm[i][j]);
+        printf ("\n");
+    }
+
+    for (int i = 0; i < nr; ++i)
+        free (tm[i]);
+
+    free (tm);
+
+    return 0;
+}
+
+]]>           
+        </programlisting>  
+
         <para>
             Megoldás forrása:                
         </para>
+<para>
+            A programunk elején itt is, a már jól megszokott módon include-oljuk a header fájlokat. Az stdio.h header-rel már korábban is találkoztunk, azt nem részletezném, viszont az stdlib.h sokak számára még új lehet. Ebben az esetben erre a <function>malloc</function> függvény miatt van szükség.
+            Majd jön a deklaráció, ami most érdekesebb mint eddig valaha, hiszen deklarálunk egy double típusú pointerre mutató pointert. (8 bájtot foglal le)
+        </para> 
         <para>
-            Tanulságok, tapasztalatok, magyarázat...
-        </para>            
+            Az if-es részben a <function>malloc</function> függvényt használjuk, ami helyet foglal a memóriában és egy pointert ad vissza.
+            A <function>malloc</function> megkapja, hogy mekkora területet foglaljon le, ami esetünkben 5*8, azaz 40 bájtot kell lefoglalnia. (nr * double pointer mérete)
+            Az if-el vizsgáljuk, hogy sikeresen megtörtént-e a helyfoglalás és, hogy a <function>malloc</function> visszaad-e a double*-okra egy mutatót.
+            Ha ez nem volt sikeres, akkor kilép a programból. (Akkor következhet be leginkább, ha nincs elegendő tárhely) Amennyiben viszont sikeres volt, haladhatunk tovább a programon.          
+        </para>         
+        <para>
+            A következő szakaszban egy for ciklust látunk, ami 0-tól nr-ig megy, azaz 5-ig. Ezen belül memóriát foglalunk a tm[i]-edik elemének (az elsőnek 8 bájtot, aztán 16-ot, 24-et és így tovább), amiről visszad a <function>malloc</function> egy pointert. Persze itt is ellenőrizve van, hogy sikeres-e a helyfoglalás és pointer létrehozás.
+        </para>
+        <para>
+            Elérkeztünk a mátrixunk megszerkesztéséhez. Két egymásba ágyazott for ciklus segítségével tudunk végigmenni az elemeken (mivel külön kell kezelni a sor- és oszlopindexeket) Itt feltöltjük a mátrixot, majd a következő, szintén egymásba ágyazott for ciklus segítségével iratjuk ki mátrix értékeit.
+        </para>
+        <para>
+            Majd láthatjuk, hogy a 4. sorban lévő értékeket, hogyan változtathatjuk meg. Ezután újra kiiratjuk a mátrixunkat és futtatás után kiderül, hogy tényleg megváltoztak az utolsó sorban az értékek.
+            A program legvégén érünk el a feladat leírásában is említett <function>free</function> függvényhez. Ennek segítségével tudjuk felszabadítani már korábban lefoglalt memóriát. 
+        </para>
+            
     </section>        
     <section>
         <title>C EXOR titkosító</title>
@@ -26,14 +110,57 @@
             Írj egy EXOR titkosítót C-ben!
         </para>
         <para>
-            Megoldás videó:
+            Az XOR művelet bitenként hasonlít össze két operandust. Kétféle értéket adhat vissza, attól függően, hogy a vizsgált két bit megegyezik vagy sem.(Ha megegyeznek, akkor 0-t ad vissza, ha nem akkor 1-et)
+            Jelen esetben ez a két operandus a forrás bemenet, amit titkosítani akarunk és egy kulcs, amire a titkosításhoz van szükség. (Ennek a feladatnak a másik része, amikor fel is törjük a kódot, szintén megtalálható a könyvben. - Hello, Caesar! C EXOR törő)
         </para>
+<programlisting language="c"><![CDATA[
+#include <stdio.h>
+#include <unistd.h>
+#include <string.h>
+            
+#define MAX_KULCS 100
+#define BUFFER_MERET 256
+            
+int
+main (int argc, char **argv)
+{
+    char kulcs[MAX_KULCS];
+    char buffer[BUFFER_MERET];
+            
+    int kulcs_index = 0;
+    int olvasott_bajtok = 0;
+            
+    int kulcs_meret = strlen (argv[1]);
+    strncpy (kulcs, argv[1], MAX_KULCS);
+            
+    while ((olvasott_bajtok = read (0, (void *) buffer, BUFFER_MERET)))
+    {
+        for (int i = 0; i < olvasott_bajtok; ++i)
+	{
+             buffer[i] = buffer[i] ^ kulcs[kulcs_index];
+             kulcs_index = (kulcs_index + 1) % kulcs_meret;
+	}
+      write (1, buffer, olvasott_bajtok);
+    }
+}
+]]></programlisting> 
+
         <para>
             Megoldás forrása:                
         </para>
+ <para>
+            Deklarálunk két char tömböt. Az elsőben tároljuk a kulcsot, a másikban a beolvasott karaktereket.
+            Valamint definiálunk még két változót, a kulcs_indexet, amit növelve bejárjuk a kulcs tömböt, és az olvasot_bajtokban fogjuk tárolni a beolvasott bájtokat.
+        </para>
         <para>
-            Tanulságok, tapasztalatok, magyarázat...
-        </para>            
+            Az strlen segítségével tudjuk meg a kulcs hosszát, amit a kulcs_meret-ben tárolunk. Az strncpy-vel pedig a kulcs tömbbe másoljuk az argv[1]-et, ami a kulcs.
+        </para>
+        <para>
+            A while cikluson belül a <function>read</function> segítségével tudunk beolvasni a pufferbe, 256 bájtot (ennyi a BUFFER_MERET). Ez a beolvasott bájtok számát adja vissza.
+            Ezen belül a for ciklusunk 0-tól megy a beolvasott_bajtok-ig és a buffer i-edik elemét össze EXOR-ozzuk a kulcs tömb megfelelő elemével.
+            Végül kiiratjuk a buffer tartalmát.
+        </para>
+           
     </section>        
     <section>
         <title>Java EXOR titkosító</title>
@@ -41,14 +168,95 @@
             Írj egy EXOR titkosítót Java-ban!
         </para>
         <para>
-            Megoldás videó:
-        </para>
-        <para>
             Megoldás forrása:                
         </para>
+         <para>
+            A fordításhoz telepítenünk kell egy csomagot: <command>sudo apt install default-jdk</command>
+            A java kódot a következőképpen fordítjuk:     
+        </para>
+<programlisting><![CDATA[
+javac ExorTitkosító.java
+]]></programlisting> 
         <para>
-            Tanulságok, tapasztalatok, magyarázat...
+            Futtatás:
+        </para>   
+<programlisting><![CDATA[
+java ExorTitkosító 321cba > titkosított.szöveg
+]]></programlisting>   
+        <para>
+            Itt 321cba lesz a kulcs és a "titkosított.szöveg" nevű fájlba irányítjuk a szöveget, amit titkosítunk. (Begépeljük, amit titkosítani szeretnénk, majd Ctrl+D)
+        </para>   
+        <para>
+            A titkosító töréséhez szükség van a kulcsra. Az alábbi módon tudjuk törni a titkosított szöveget: (A standard output-ra írja ki az eredeti "tiszta" szöveget.)
+        </para>   
+<programlisting><![CDATA[
+java ExorTitkosító 321cba < titkosított.szöveg
+]]></programlisting> 
+        <para>
+         A teljes program:
+        </para>
+        <programlisting language='java'><![CDATA[
+public class ExorTitkosító {
+    
+    public ExorTitkosító(String kulcsSzöveg,
+            java.io.InputStream bejövőCsatorna,
+            java.io.OutputStream kimenőCsatorna)
+            throws java.io.IOException {
+        
+        byte [] kulcs = kulcsSzöveg.getBytes();
+        byte [] buffer = new byte[256];
+        int kulcsIndex = 0;
+        int olvasottBájtok = 0;
+        while((olvasottBájtok =
+                bejövőCsatorna.read(buffer)) != -1) {
+            
+            for(int i=0; i<olvasottBájtok; ++i) {
+                
+                buffer[i] = (byte)(buffer[i] ^ kulcs[kulcsIndex]);
+                kulcsIndex = (kulcsIndex+1) % kulcs.length;
+                
+            }
+            
+            kimenőCsatorna.write(buffer, 0, olvasottBájtok);
+            
+        }
+        
+    }
+    
+    public static void main(String[] args) {
+        
+        try {
+            
+            new ExorTitkosító(args[0], System.in, System.out);
+            
+        } catch(java.io.IOException e) {
+            
+            e.printStackTrace();
+            
+        }
+        
+    }
+    
+}            
+     ]]></programlisting> 
+        <para>
+            Hasonló helyzetben vagyunk, mint az előző feladatban. Itt is titkosítanunk kell egy tiszta szöveget EXOR-ral, de most nem C-ben, hanem Java-ban.
         </para>            
+        <para>
+            Az egész kódunk egy jó nagy class-ból áll, aminek két nagyobb része van. Kezdjük talán a <function>main</function>-nel.
+            A main itt máshogy néz ki, mint ahogy azt C-ben már megszoktuk. Ráadásul itt láthatunk először példát a kivételkezelésre. (try, catch)
+            A <function>try</function> és a <function>catch</function> használata, nem csak Java-ban, hanem C++-ban is igen elterjedt 
+            Hiba esetén a try "dobja", a catch "elkapja" a hibát és küld egy hibaüzenetet a terminálba.
+        </para>
+        <para>
+            Az <function>ExorTitkosító</function> függvényen belül utasításokat hajtunk végre, olyanokat amiket már C-ben is csináltunk.
+            Létrehozunk egy <function>byte</function>-okból álló tömböt. A <function>getBytes()</function> függvény segítségével olvassuk be a
+            kulcsot a kulcs tömbbe. A buffer tömbnek ugyanúgy, ahogy a korábbi C-s feladatban, 256 bájtból álló területet foglalunk.
+            Innen már nagyon hasonlóan működik a program, mint a C-s testvére.
+            A <function>while</function> cikluson belül itt is található egy <function>for</function> ciklus, ahol elemenként össze EXOR-ozzuk a buffer tartalmát a kulccsal.
+            Végül kiiratjuk a puffer tartalmát.
+        </para>
+            
     </section>        
     <section>
         <title>C EXOR törő</title>
@@ -56,14 +264,146 @@
             Írj egy olyan C programot, amely megtöri az első feladatban előállított titkos szövegeket!
         </para>
         <para>
-            Megoldás videó:
-        </para>
-        <para>
             Megoldás forrása:                
         </para>
         <para>
-            Tanulságok, tapasztalatok, magyarázat...
-        </para>            
+            Ebben a feladatban pont az ellentétét kell csinálni, annak amit a második feladatban csináltunk. Az ott titkosított szöveget kell feltörnünk.
+            Ez, érthető módon egy fokkal nehezebb feladat.
+        </para>
+        <para>
+            A teljes program:
+        </para>
+        <programlisting language='c'><![CDATA[
+
+#define MAX_TITKOS 4096
+#define OLVASAS_BUFFER 256
+#define KULCS_MERET 8
+#define _GNU_SOURCE
+
+#include <stdio.h>
+#include <unistd.h>
+#include <string.h>
+
+double
+atlagos_szohossz (const char *titkos, int titkos_meret)
+{
+  int sz = 0;
+  for (int i = 0; i < titkos_meret; ++i)
+    if (titkos[i] == ' ')
+      ++sz;
+
+  return (double) titkos_meret / sz;
+}
+
+int
+tiszta_lehet (const char *titkos, int titkos_meret)
+{
+  // a tiszta szoveg valszeg tartalmazza a gyakori magyar szavakat
+  // illetve az átlagos szóhossz vizsgálatával csökkentjük a
+  // potenciális töréseket
+
+  double szohossz = atlagos_szohossz (titkos, titkos_meret);
+
+  return szohossz > 6.0 && szohossz < 9.0
+    && strcasestr (titkos, "hogy") && strcasestr (titkos, "nem")
+    && strcasestr (titkos, "az") && strcasestr (titkos, "ha");
+
+}
+
+void
+exor (const char kulcs[], int kulcs_meret, char titkos[], int titkos_meret)
+{
+
+  int kulcs_index = 0;
+
+  for (int i = 0; i < titkos_meret; ++i)
+    {
+
+      titkos[i] = titkos[i] ^ kulcs[kulcs_index];
+      kulcs_index = (kulcs_index + 1) % kulcs_meret;
+
+    }
+
+}
+
+int
+exor_tores (const char kulcs[], int kulcs_meret, char titkos[],
+	    int titkos_meret)
+{
+
+  exor (kulcs, kulcs_meret, titkos, titkos_meret);
+
+  return tiszta_lehet (titkos, titkos_meret);
+
+}
+
+int
+main (void)
+{
+
+  char kulcs[KULCS_MERET];
+  char titkos[MAX_TITKOS];
+  char *p = titkos;
+  int olvasott_bajtok;
+
+  while ((olvasott_bajtok =
+	  read (0, (void *) p,
+		(p - titkos + OLVASAS_BUFFER <
+		 MAX_TITKOS) ? OLVASAS_BUFFER : titkos + MAX_TITKOS - p)))
+    p += olvasott_bajtok;
+
+  // maradek hely nullazasa a titkos bufferben  
+  for (int i = 0; i < MAX_TITKOS - (p - titkos); ++i)
+    titkos[p - titkos + i] = '\0';
+
+  // osszes kulcs eloallitasa
+for (int ii = '0'; ii <= '9'; ++ii)           
+  for (int ji = '0'; ji <= '9'; ++ji)
+    for (int ki = '0'; ki <= '9'; ++ki)
+	    for (int li = '0'; li <= '9'; ++li)
+	      for (int mi = '0'; mi <= '9'; ++mi)
+	        for (int ni = '0'; ni <= '9'; ++ni)
+	          for (int oi = '0'; oi <= '9'; ++oi)
+		          for (int pi = '0'; pi <= '9'; ++pi)
+                {
+                kulcs[0] = ii;
+                kulcs[1] = ji;
+                kulcs[2] = ki;
+                kulcs[3] = li;
+                kulcs[4] = mi;
+                kulcs[5] = ni;
+                kulcs[6] = oi;
+                kulcs[7] = pi;
+
+                if (exor_tores (kulcs, KULCS_MERET, titkos, p - titkos))
+                    printf("Kulcs: [%c%c%c%c%c%c%c%c]\nTiszta szoveg: [%s]\n",ii, ji, ki, li, mi, ni, oi,pi, titkos);
+
+                    // ujra EXOR-ozunk, igy nem kell egy masodik buffer  
+                    exor (kulcs, KULCS_MERET, titkos, p - titkos);                
+                }                            
+
+  return 0;
+}
+            
+     ]]></programlisting>
+ <para>
+            A program elején lévő _GNU_SOURCE új lehet számunkra. Erre a strcasestr használata miatt van szükség.
+            Láthatjuk, hogy a kulcsméret 8-ra van állítva, azaz feltételezzük, hogy a kulcs 8 elemből áll. (nem tűnik túl hatékonynak)
+        </para>         
+        <para>
+            Az <function>atlagos_szohossz</function> függvénnyel kiszámítjuk a bemenet átlagos szóhosszát. Majd a <function>tiszta_lehet</function> függvény megvizsgálja, hogy a fejtésben lévő kód tiszta-e már.
+            Itt elérkeztünk a programunk egy újabb gyengeségéhez, ugyanis a program feltételezi, hogy a tiszta szöveg valszeg tartalmazza a gyakori magyar szavakat, illetve az átlagos szóhossz vizsgálatával akarja csökkenteni a lehetséges töréseket.
+            Ha ezeknek nem felel meg a tiszta szöveg, akkor nem tudjuk feltörni.
+        </para>
+        <para>
+            Az <function>exor</function> függvény hasonlóan működik, mint a titkosításnál. Ezáltal visszakapjuk a tiszta szöveget, elvégre ha valamit duplán EXOR-ozunk, akkor önmagát kapjuk.
+            Majd elérünk az <function>exor_tores</function> függvényhez, ami 0-át valamint 1-et ad vissza, a szöveg tisztaságától függően.
+            A <function>main</function>-en belül elvégezzük a szükséges deklarációkat, majd egy <function>while</function> ciklussal folyamatosan olvassuk a bájtokat, a bemenet végéig, vagy amíg a bufferünk tele nem lesz.
+            A következő <function>for</function> ciklussal azokat a helyeket, amik megmaradtak a bufferben kinullázuk. Majd jön egy időigényes rész, ahol az összes lehetséges kulcsot előállítjuk.
+            A végén meghívjuk az <function>exor_tores</function> függvényt, aminek ha 1 a visszatérési értéke, akkor kiírja a program a kulcsot és a már feltört szöveget.
+            (megj.: csak azokat tudja feltörni, amiket számokkal kódoltunk)
+        </para>
+           
     </section>        
     <section>
         <title>Neurális OR, AND és EXOR kapu</title>
