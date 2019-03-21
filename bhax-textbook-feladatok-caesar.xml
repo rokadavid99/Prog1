@@ -171,26 +171,26 @@ main (int argc, char **argv)
             Megoldás forrása:                
         </para>
          <para>
-            A fordításhoz telepítenünk kell egy csomagot: <command>sudo apt install default-jdk</command>
+            A fordításhoz szükségünk lesz egy csomag telepítésére: <command>sudo apt install default-jdk</command>
             A java kódot a következőképpen fordítjuk:     
         </para>
 <programlisting><![CDATA[
-javac ExorTitkosító.java
+javac exort.java
 ]]></programlisting> 
         <para>
             Futtatás:
         </para>   
 <programlisting><![CDATA[
-java ExorTitkosító 321cba > titkosított.szöveg
+java exort asd214 > titkosított.szöveg
 ]]></programlisting>   
         <para>
-            Itt 321cba lesz a kulcs és a "titkosított.szöveg" nevű fájlba irányítjuk a szöveget, amit titkosítunk. (Begépeljük, amit titkosítani szeretnénk, majd Ctrl+D)
+            Itt asd214 lesz a kulcs és a "titkosított.szöveg" nevű fájlba irányítjuk a szöveget, amit titkosítunk. (Begépeljük, amit titkosítani szeretnénk, majd Ctrl+D)
         </para>   
         <para>
             A titkosító töréséhez szükség van a kulcsra. Az alábbi módon tudjuk törni a titkosított szöveget: (A standard output-ra írja ki az eredeti "tiszta" szöveget.)
         </para>   
 <programlisting><![CDATA[
-java ExorTitkosító 321cba < titkosított.szöveg
+java exort 3asd214 < titkosított.szöveg
 ]]></programlisting> 
         <para>
          A teljes program:
