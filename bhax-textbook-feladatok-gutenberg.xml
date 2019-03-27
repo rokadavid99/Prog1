@@ -32,33 +32,7 @@
             nem maradhat ki a Pascal, az Ada, a PL/I, és a C nyelv sem. A könyvben szó esik az ezen
             programnyelvek közti különbségekről, illetve hasonlóságokról, valamit a különböző program
             nyelvek szintaktikájáról és szemantikájáról is.
-        </para>
-        <para>
-            A 28. oldalon az adattípusokról olvashatunk, ami az absztrakció első megjelenési formája a
-            programozási nyelvekben. Egy adattípust három dolog határoz meg, ezek:
-        </para>
-        <para>
-            • tartomány
-        </para>
-        <para>
-            • műveletek
-        </para>
-        <para>
-            • reprezentáció
-        </para>
-        <para>
-            A könyv részletezi az egyszerű, az összetett és a mutató típusokat is. Ez utóbbi lényegében
-            egy egyszerű típus, a különbség az annyi, hogy a tartományának elemei tárcímek.
-            Említést kell tennünk továbbá a nevesített konstansokról is, ami olyan programozási eszköz,
-            amelynek három komponense van: a név, a típus, és az érték. A nevesített konstanst mindig
-            deklarálni kell.
-        </para>
-        <para>
-            A 35. oldalon elértünk a változókhoz. A változó egy olyan programozási eszköz, melynek 4
-            komponense van: név, attribútumok, cím és érték. Változókkal a későbbiekben is rengetegszer
-            fogunk találkozni, mivel az egyik legalapvetőbb elemei a kódoknak.
-        </para>
-        
+        </para>   
     </section> 
            
     <section>
