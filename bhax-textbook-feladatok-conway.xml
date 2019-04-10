@@ -14,12 +14,217 @@
         <para>
             Megoldás videó: <link xlink:href="https://bhaxor.blog.hu/2018/10/10/myrmecologist">https://bhaxor.blog.hu/2018/10/10/myrmecologist</link>
         </para>
+   <para>
+            A képernyőnket kis cellákra osztjuk, amikben a hangyák megkeresik azt a szomszédjukat, akinek a legerősebb a feromonja. (erre lép tovább)
+            A cellák feromon értékeit folyamat csökkentjük, de amikor egy hangya belelép az egyikbe, akkor ott növeljük a feromonszintet.
+            Tehát tulajdonképpen a kódunk szimulálja a hangyák feromonokkal való kommunikációját.
+            A <filename>main.cpp</filename>-ben leírtak szerint futtatjuk, azaz így:
+        </para>
+        <programlisting> 
+./myrmecologist -w 250 -m 150 -n 400 -t 10 -p 5 -f 80 -d 0 -a 255 -i 3 -s 3  -c 22
+        </programlisting>
         <para>
-            Megoldás forrása: <link xlink:href=""></link>               
+            A különböző kapcsolók különböző jelentésekkel bírnak:
         </para>
         <para>
-            Tanulságok, tapasztalatok, magyarázat...
-        </para>            
+            • A <function>w</function> és az <function>m</function> kapcsolók segítségével tudjuk beállítani a cellák szélességét (hány oszlopból álljon), valamint magasságát. 
+        </para>
+        <para>
+            • Az <function>n</function> kapcsolóval a hangyák számát tudjuk beállítani.
+        </para>
+        <para>
+            • A <function>t</function> kapcsoló segítségével a hangyák lépéseinek gyakoriságát tudjuk megadni. (millisec-ben)
+        </para>
+        <para>
+            • A <function>p</function> kapcsolóval a feromonok párolgását állíthatjuk be.
+        </para>
+        <para>
+            • Az <function>f</function> kapcsolóval azt állítjuk be, hogy ha egy hangya belép egy cellába, akkor a feromonérték mennyivel nőjjön.
+        </para>
+        <para>
+            • A <function>d</function> kapcsolóval a cellák feromonértékének a kezdőértékét adhatjuk meg.
+        </para>
+        <para>
+            • Az <function>a</function> és a <function>i</function> kapcsolókkal meg tudjuk adni a maximum és a minimum fermonoértékeket.
+        </para>
+        <para>
+            • Az <function>s</function> kapcsolóval azt állítjuk be, hogy a hangyák mennyi feromont hagyjanak a szomszédos cellákban.
+        </para>
+        <para>
+            • Illetve a <function>c</function> kapcsolóval azt is beállíthatjuk, hogy egyszerre max mennyi hangya lehessen egy cellában.
+            Ezeket nem kötelező megadni, hisz vannak alapértelmezett adatok a programba építve.
+        </para>
+
+  <para>
+            Kezdjük a legkisebb osztállyal (Ant), amit az <filename>ant.h</filename> header tartalmaz:
+        </para>
+        <programlisting language="c++"><![CDATA[
+class Ant
+{
+
+public:
+    int x;
+    int y;
+    int dir;
+
+    Ant(int x, int y): x(x), y(y) {
+        
+        dir = qrand() % 8;
+        
+    }
+
+};
+
+typedef std::vector<Ant> Ants;]]>
+            </programlisting>
+        <para>
+            Az Ant class-ban a hangya tulajdonságai vannak leírva. Az x és az y pont mint a matematikában, itt is koordinátákat jelentenek, a dir pedig az irányt jelöli, ahova tart.
+            A + jelűeket el lehet érni osztályon kívül is, azaz ezek public elérésűek. 
+            A - jelűek pedig értelemszerűen private elérésűek.
+            Az ants egy olyan vektor ami a hangyákat tárolja.         
+        </para>
+        <para>
+            A következő osztály az <function>AntWin</function>.
+        </para>
+        <programlisting language="c++"><![CDATA[
+#include <QMainWindow>
+#include <QPainter>
+#include <QString>
+#include <QCloseEvent>
+#include "antthread.h"
+#include "ant.h"
+
+class AntWin : public QMainWindow
+{
+    Q_OBJECT
+
+public:
+    AntWin(int width = 100, int height = 75,
+           int delay = 120, int numAnts = 100,
+           int pheromone = 10, int nbhPheromon = 3,
+           int evaporation = 2, int cellDef = 1,
+           int min = 2, int max = 50,
+           int cellAntMax = 4, QWidget *parent = 0);
+
+    AntThread* antThread;
+
+    void closeEvent ( QCloseEvent *event ) {
+
+        antThread->finish();
+        antThread->wait();
+        event->accept();
+    }
+
+    void keyPressEvent ( QKeyEvent *event )
+    {
+
+        if ( event->key() == Qt::Key_P ) {
+            antThread->pause();
+        } else if ( event->key() == Qt::Key_Q
+                    ||  event->key() == Qt::Key_Escape ) {
+            close();
+        }
+
+    }
+
+    virtual ~AntWin();
+    void paintEvent(QPaintEvent*);
+
+private:
+
+    int ***grids;
+    int **grid;
+    int gridIdx;
+    int cellWidth;
+    int cellHeight;
+    int width;
+    int height;
+    int max;
+    int min;
+    Ants* ants;
+
+public slots :
+    void step ( const int &);
+
+};]]>
+            </programlisting>
+            <para>
+               A <function>QMainWindow</function> osztállyal tudjuk megalkotni a programunk ablakát.
+               A width és a height az ablak szélessége és magassága pixelekben megadva. A cellwidth és a cellheight pedig a cellák szélessége és magassága, ahol a hangyákat ábrázoljuk.
+               Az <function>antThread</function> a számításokat végzi. Itt történik a programablak létrehozása, valamint az egyes paramétereket is itt állítjuk be.
+               A min és a max a lehetséges (minimális(1) és maximális(255)) feromonértékeket jelenti.
+               A gombnyomások feldolgozása is ebben a részben történik, valamint a hangyák színezése is. (<function>paintEvent()</function>) 
+            </para>
+            <para>
+                Végül pedig következzen az <filename>antthread.h</filename> és az <filename>antthread.cpp</filename>.
+            </para>
+<programlisting language="c++"><![CDATA[
+#include <QThread>
+#include "ant.h"
+
+class AntThread : public QThread
+{
+    Q_OBJECT
+
+public:
+    AntThread(Ants * ants, int ***grids, int width, int height,
+             int delay, int numAnts, int pheromone, int nbrPheromone, 
+             int evaporation, int min, int max, int cellAntMax);
+    
+    ~AntThread();
+    
+    void run();
+    void finish()
+    {
+        running = false;
+    }
+
+    void pause()
+    {
+        paused = !paused;
+    }
+
+    bool isRunnung()
+    {
+        return running;
+    }
+
+private:
+    bool running {true};
+    bool paused {false};
+    Ants* ants;
+    int** numAntsinCells;
+    int min, max;
+    int cellAntMax;
+    int pheromone;
+    int evaporation;
+    int nbrPheromone;
+    int ***grids;
+    int width;
+    int height;
+    int gridIdx;
+    int delay;
+    
+    void timeDevel();
+
+    int newDir(int sor, int oszlop, int vsor, int voszlop);
+    void detDirs(int irany, int& ifrom, int& ito, int& jfrom, int& jto );
+    int moveAnts(int **grid, int row, int col, int& retrow, int& retcol, int);
+    double sumNbhs(int **grid, int row, int col, int);
+    void setPheromone(int **grid, int row, int col);
+
+signals:
+    void step ( const int &);
+
+};]]>
+            </programlisting>
+            <para>
+                Ebben az osztályban a tulajdonságok hasonlóak, mint az <function>AntWin</function>-ben.
+                A konstruktor megkapja azokat az értékeket, amiket az <function>AntWin</function>-ban megkapott a program és elkezdi mozgatni a hangyákat. (<function>MoveAnts()</function>)
+                Elvégzi a lényegi számításokat, mint az irány kiszámítása és a cellák feromonértékeinek beállítása. Majd ez adja meg az <function>AntWin</function>-nek, hogy mit kell átszínezni. 
+            </para>
+
+
     </section>        
     <section>
         <title>Java életjáték</title>
@@ -42,29 +247,344 @@
         <para>
             Most Qt C++-ban!
         </para>
+<para>
+            Emiatt fordításkor kicsit más a helyzet, mint ahogy azt korábban megszokhattuk.
+            A <command>qmake -project</command> parancs, a .pro fájl legenerálásához kell.
+            Majd futtatjuk ezt, ami ad nekünk egy Makefile-t. A <command>make</command> parancs fordítja le a programunkat.
+        </para>       
         <para>
-            Megoldás videó: 
+            Szemléltetésképpen:
+        </para>    
+        <programlisting>
+$ qmake -project
+$ qmake Eletjatek.pro
+$ make
+$ ./Eletjatek           
+        </programlisting>
+        <para>
+            Mivel nagyon hosszú lenne minden forrást berakni, ezért csak 1-2 lényegesebb, rövidebb részt teszek be.
         </para>
+        <programlisting language="c++"><![CDATA[
+#include <QThread>
+#include "sejtablak.h"
+
+class SejtAblak;
+
+class SejtSzal : public QThread
+{
+    Q_OBJECT
+
+public:
+    SejtSzal(bool ***racsok, int szelesseg, int magassag,
+             int varakozas, SejtAblak *sejtAblak);
+    ~SejtSzal();
+    void run();
+
+protected:
+    bool ***racsok;
+    int szelesseg, magassag;   
+    int racsIndex;   
+    int varakozas;
+    void idoFejlodes();
+    int szomszedokSzama(bool **racs,
+                        int sor, int oszlop, bool allapot);
+    SejtAblak* sejtAblak;
+
+};]]>
+	</programlisting>
         <para>
-            Megoldás forrása: <link xlink:href=""></link>               
+            Magát a <function>SejtSzal</function> osztályt a <filename>sejtszal.h</filename> header valamint a hozzá kapcsolódó <filename>sejtszal.cpp</filename> fájl tartalmazza.
+            Itt történik a sejtek 3 állapotának leírása, azaz a születés, életben maradás és az elhalálozás.
+            A <function>racsIndex</function> megmutatja, hogy melyik az éppen aktuális rácsindex.
+            A <function>varakozas</function> pedig két egymást követő időpillanat közötti időt tartalmazza.
         </para>
-        <para>
-            Tanulságok, tapasztalatok, magyarázat...
-        </para>            
+
+         <programlisting language="c++"><![CDATA[
+void SejtSzal::idoFejlodes() {
+    bool **racsElotte = racsok[racsIndex];
+    bool **racsUtana = racsok[(racsIndex+1)%2];
+    for(int i=0; i<magassag; ++i) { // sorok
+        for(int j=0; j<szelesseg; ++j) { // oszlopok
+            int elok = szomszedokSzama(racsElotte, i, j, SejtAblak::ELO);
+            if(racsElotte[i][j] == SejtAblak::ELO) {
+                
+                if(elok==2 || elok==3)
+                    racsUtana[i][j] = SejtAblak::ELO;
+                else
+                    racsUtana[i][j] = SejtAblak::HALOTT;
+            }  else {
+               
+                if(elok==3)
+                    racsUtana[i][j] = SejtAblak::ELO;
+                else
+                    racsUtana[i][j] = SejtAblak::HALOTT;
+            }
+        }
+    }
+    racsIndex = (racsIndex+1)%2;
+}
+]]></programlisting> 
+            <para>
+                A szabályokat az <function>idoFejlodes()</function> eljárás felügyeli. 
+                A sejtek állapota is itt dől el.
+            </para>
+            <para>
+                Sikló:
+            </para>   
+         <programlisting language="c++"><![CDATA[
+void SejtAblak::siklo(bool **racs, int x, int y) {
+  
+  racs[y+ 0][x+ 2] = ELO;
+  racs[y+ 1][x+ 1] = ELO;
+  racs[y+ 2][x+ 1] = ELO;
+  racs[y+ 2][x+ 2] = ELO;
+  racs[y+ 2][x+ 3] = ELO;
+  
+}
+]]></programlisting>
+            <para>
+                A siklókilövő:
+            </para>
+<programlisting language="c++"><![CDATA[
+void SejtAblak::sikloKilovo(bool **racs, int x, int y) {
+
+    racs[y+ 6][x+ 0] = ELO;
+    racs[y+ 6][x+ 1] = ELO;
+    racs[y+ 7][x+ 0] = ELO;
+    racs[y+ 7][x+ 1] = ELO;
+
+    racs[y+ 3][x+ 13] = ELO;
+
+    racs[y+ 4][x+ 12] = ELO;
+    racs[y+ 4][x+ 14] = ELO;
+
+    racs[y+ 5][x+ 11] = ELO;
+    racs[y+ 5][x+ 15] = ELO;
+    racs[y+ 5][x+ 16] = ELO;
+    racs[y+ 5][x+ 25] = ELO;
+
+    racs[y+ 6][x+ 11] = ELO;
+    racs[y+ 6][x+ 15] = ELO;
+    racs[y+ 6][x+ 16] = ELO;
+    racs[y+ 6][x+ 22] = ELO;
+    racs[y+ 6][x+ 23] = ELO;
+    racs[y+ 6][x+ 24] = ELO;
+    racs[y+ 6][x+ 25] = ELO;
+
+    racs[y+ 7][x+ 11] = ELO;
+    racs[y+ 7][x+ 15] = ELO;
+    racs[y+ 7][x+ 16] = ELO;
+    racs[y+ 7][x+ 21] = ELO;
+    racs[y+ 7][x+ 22] = ELO;
+    racs[y+ 7][x+ 23] = ELO;
+    racs[y+ 7][x+ 24] = ELO;
+
+    racs[y+ 8][x+ 12] = ELO;
+    racs[y+ 8][x+ 14] = ELO;
+    racs[y+ 8][x+ 21] = ELO;
+    racs[y+ 8][x+ 24] = ELO;
+    racs[y+ 8][x+ 34] = ELO;
+    racs[y+ 8][x+ 35] = ELO;
+
+    racs[y+ 9][x+ 13] = ELO;
+    racs[y+ 9][x+ 21] = ELO;
+    racs[y+ 9][x+ 22] = ELO;
+    racs[y+ 9][x+ 23] = ELO;
+    racs[y+ 9][x+ 24] = ELO;
+    racs[y+ 9][x+ 34] = ELO;
+    racs[y+ 9][x+ 35] = ELO;
+
+    racs[y+ 10][x+ 22] = ELO;
+    racs[y+ 10][x+ 23] = ELO;
+    racs[y+ 10][x+ 24] = ELO;
+    racs[y+ 10][x+ 25] = ELO;
+
+    racs[y+ 11][x+ 25] = ELO;
+
+}]]>
+			</programlisting>
+                        <para>
+                            A sejteket egyesével rajzoljuk ki a megfelelő helyekre.
+                        </para>
+           
+            <para>
+                A <function>main()</function> ilyen rövid:
+            </para>
+<programlisting language="c++"><![CDATA[
+#include <QApplication>
+#include "sejtablak.h"
+#include <QDesktopWidget>
+int main(int argc, char *argv[])
+{
+  QApplication a(argc, argv);
+  SejtAblak w(100, 75);
+  w.show();
+  
+  return a.exec();
+}
+]]></programlisting> 
+          
     </section>        
     <section>
         <title>BrainB Benchmark</title>
         <para>
         </para>
-        <para>
-            Megoldás videó: 
+       <para>
+            <command>sudo apt-get install opencv-data</command>
         </para>
         <para>
-            Megoldás forrása: <link xlink:href=""></link>               
+            <command>sudo apt-get install libopencv-dev</command>
         </para>
         <para>
-            Tanulságok, tapasztalatok, magyarázat...
-        </para>            
+            <command>sudo apt-get install libqt4-dev</command>
+        </para>
+        <para>
+            <command>sudo apt-get install opencv-data</command>
+        </para>
+        <para>
+            <command>sudo apt-get install libopencv-dev </command>
+        </para>
+        <para>
+            Ennek a programnak egy nemes célja van, ami az esportolók tesztelése, illetve esport tehetségek felkutatása.
+            A benchmark azt teszteli, hogy ha elveszítettük a karakterünket, akkor mennyi időbe kerül mire újra megtaláljuk, valamint ha megtaláltuk, akkor mennyi idő után veszítjük el.
+            Ezek alapján ad pontszámot a felhasználóknak, akik össze tudják mérni, hogy ki a jobb.
+            Az egeret lenyomva kell tartani és a kurzort pedig egy mozgó dobozon ('Samu Entropy') lévő körön belül.
+            A nehezítés az az, hogy folyamat új dobozok jelennek meg a képernyőn és ezek egyre gyorsabban mozognak.
+            Ha elrontjuk, akkor lassul az alakzat mozgása.
+            A játék 10 percig tart, de közben is ki lehet lépni az Esc billentyű lenyomásával.
+            A végén pedig kapunk egy fájlt, ami tartalmazza az eredményünket. 
+        </para>   
+        <programlisting>
+$ qmake brainB.pro 
+$ make
+$ ./BrainB           
+        </programlisting> 
+        <para>
+            Kezdjük talán a <filename>main.cpp</filename> fájllal.
+        </para>
+        <programlisting language='c++'><![CDATA[
+#include <QApplication>
+#include <QTextStream>
+#include <QtWidgets>
+#include "BrainBWin.h"
+
+int main ( int argc, char **argv )
+{
+        QApplication app ( argc, argv );
+
+        QTextStream qout ( stdout );
+        qout.setCodec ( "UTF-8" );
+        .
+        .
+        .
+        QRect rect = QApplication::desktop()->availableGeometry();
+        BrainBWin brainBWin ( rect.width(), rect.height() );
+        brainBWin.setWindowState ( brainBWin.windowState() ^ Qt::WindowFullScreen );
+        brainBWin.show();
+        return app.exec();
+}                
+]]>        </programlisting>    
+            <para>
+                A <filename>BrainBWin.h</filename>-val tudjuk elérni a többi fájlt.
+                A felette lévő include-okra azért van szükségünk, mert használjuk a Qt-t.
+                A <function>main</function> elején deklarálunk egy <function>QApplication</function> típusú objektumot.
+                A <function>qout</function>-ra pedig a kiiratáshoz van szükség. (hasonló az <function>std::cout</function>-hoz, hisz itt is beleshifteljük a kimenetet)
+                A <function>QRect</function> osztály a téglalap kirajzolásában segít.
+                Létrehozzuk a <function>BrainBWin</function> objektumot, ami megkapja a képernyő méretét és meghívjuk a konstruktorát:
+            </para>
+ <programlisting language = "c++"><![CDATA[
+BrainBWin::BrainBWin ( int w, int h, QWidget *parent ) : QMainWindow ( parent )
+{
+
+
+        statDir = appName + " " + appVersion + " - " + QDate::currentDate().toString() + QString::number ( QDateTime::currentMSecsSinceEpoch() );
+
+        brainBThread = new BrainBThread ( w, h - yshift );
+        brainBThread->start();
+
+        connect ( brainBThread, SIGNAL ( heroesChanged ( QImage, int, int ) ),
+                  this, SLOT ( updateHeroes ( QImage, int, int ) ) );
+
+        connect ( brainBThread, SIGNAL ( endAndStats ( int ) ),
+                  this, SLOT ( endAndStats ( int ) ) );
+
+}]]>
+            </programlisting>
+            <programlisting language='c++'><![CDATA[
+BrainBThread::BrainBThread ( int w, int h )
+{
+
+        dispShift = heroRectSize+heroRectSize/2;
+
+        this->w = w - 3 * heroRectSize;
+        this->h = h - 3 * heroRectSize;
+
+        std::srand ( std::time ( 0 ) );
+
+        Hero me ( this->w / 2 + 200.0 * std::rand() / ( RAND_MAX + 1.0 ) - 100,
+                  this->h / 2 + 200.0 * std::rand() / ( RAND_MAX + 1.0 ) - 100,
+                                                         255.0 * std::rand() / ( RAND_MAX + 1.0 ), 9 );
+
+        Hero other1 ( this->w / 2 + 200.0 * std::rand() / ( RAND_MAX + 1.0 ) - 100,
+                      this->h / 2 + 200.0 * std::rand() / ( RAND_MAX + 1.0 ) - 100, 255.0 * std::rand() / ( RAND_MAX + 1.0 ), 5, "Norbi Entropy" );
+        Hero other2 ( this->w / 2 + 200.0 * std::rand() / ( RAND_MAX + 1.0 ) - 100,
+                      this->h / 2 + 200.0 * std::rand() / ( RAND_MAX + 1.0 ) - 100, 255.0 * std::rand() / ( RAND_MAX + 1.0 ), 3, "Greta Entropy" );
+        Hero other4 ( this->w / 2 + 200.0 * std::rand() / ( RAND_MAX + 1.0 ) - 100,
+                      this->h / 2 + 200.0 * std::rand() / ( RAND_MAX + 1.0 ) - 100, 255.0 * std::rand() / ( RAND_MAX + 1.0 ), 5, "Nandi Entropy" );
+        Hero other5 ( this->w / 2 + 200.0 * std::rand() / ( RAND_MAX + 1.0 ) - 100,
+                      this->h / 2 + 200.0 * std::rand() / ( RAND_MAX + 1.0 ) - 100, 255.0 * std::rand() / ( RAND_MAX + 1.0 ), 7, "Matyi Entropy" );
+
+        heroes.push_back ( me );
+        heroes.push_back ( other1 );
+        heroes.push_back ( other2 );
+        heroes.push_back ( other4 );
+        heroes.push_back ( other5 );
+
+}
+Hero ( int x=0, int  y=0, int color=0, int agility=1,  std::string name ="Samu Entropy" )
+    void move ( int maxx, int maxy, int env ) {
+
+        int newx = x+ ( ( ( double ) agility*1.0 ) * ( double ) ( std::rand() / ( RAND_MAX+1.0 ) )-agility/2 ) ;
+        if ( newx-env > 0 && newx+env < maxx ) {
+            x = newx;
+        }
+        int newy = y+ ( ( ( double ) agility*1.0 ) * ( double ) ( std::rand() / ( RAND_MAX+1.0 ) )-agility/2 );
+        if ( newy-env > 0 && newy+env < maxy ) {
+            y = newy;
+        }
+
+
+
+class BrainBThread : public QThread
+{
+    Q_OBJECT
+
+    
+     //Norbi
+    cv::Scalar cBg { 247, 223, 208 };
+    cv::Scalar cBorderAndText { 47, 8, 4 };
+    cv::Scalar cCenter { 170, 18, 1 };
+    cv::Scalar cBoxes { 10, 235, 252 };
+    Heroes heroes;
+    int heroRectSize {40};
+
+    cv::Mat prev {3*heroRectSize, 3*heroRectSize, CV_8UC3, cBg };
+    int bps;
+    long time {0};
+    long endTime {10*60*10};
+    int delay {100};
+
+    bool paused {true};
+    int nofPaused {0};
+
+    std::vector<int> lostBPS;
+    std::vector<int> foundBPS;
+
+    int w;
+    int h;
+    int dispShift {40};]]>
+            </programlisting>
+          
     </section>        
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
 </chapter>                
