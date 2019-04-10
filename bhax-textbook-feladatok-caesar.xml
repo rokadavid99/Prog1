@@ -171,26 +171,26 @@ main (int argc, char **argv)
             Megoldás forrása:                
         </para>
          <para>
-            A fordításhoz szükségünk lesz egy csomag telepítésére: <command>sudo apt install default-jdk</command>
+            A fordításhoz telepítenünk kell egy csomagot: <command>sudo apt install default-jdk</command>
             A java kódot a következőképpen fordítjuk:     
         </para>
 <programlisting><![CDATA[
-javac exort.java
+javac ExorTitkosító.java
 ]]></programlisting> 
         <para>
             Futtatás:
         </para>   
 <programlisting><![CDATA[
-java exort asd214 > titkosított.szöveg
+java ExorTitkosító 321cba > titkosított.szöveg
 ]]></programlisting>   
         <para>
-            Itt asd214 lesz a kulcs és a "titkosított.szöveg" nevű fájlba irányítjuk a szöveget, amit titkosítunk. (Begépeljük, amit titkosítani szeretnénk, majd Ctrl+D)
+            Itt 321cba lesz a kulcs és a "titkosított.szöveg" nevű fájlba irányítjuk a szöveget, amit titkosítunk. (Begépeljük, amit titkosítani szeretnénk, majd Ctrl+D)
         </para>   
         <para>
             A titkosító töréséhez szükség van a kulcsra. Az alábbi módon tudjuk törni a titkosított szöveget: (A standard output-ra írja ki az eredeti "tiszta" szöveget.)
         </para>   
 <programlisting><![CDATA[
-java exort 3asd214 < titkosított.szöveg
+java ExorTitkosító 321cba < titkosított.szöveg
 ]]></programlisting> 
         <para>
          A teljes program:
@@ -425,15 +425,58 @@ for (int ii = '0'; ii <= '9'; ++ii)
         <para>
             C++
         </para>
+      <para>
+            Tisztáznunk kell, hogy mi is az a perceptron. A perceptron egy olyan algoritmus, ami "megtanítja" a bináris osztályozást a számítógépnek.
+            A program C++-ban íródott. A könyv korábbi részeiben, már fellelhető volt 1-2 kisebb C++ program, de ilyen kaliberű még nem.           
+        </para>    
         <para>
-            Megoldás videó:
+            A Perceptron mappában 3 cpp kiterjesztésű fájl is található. Ezek közül a <filename>mandelpng.cpp</filename> fájl segítségével tudunk képet csinálni Mandelbrot halmazról.
+            (ez most annyira nem lényeges, mert a következő fejezetben úgyis részletesebben lesz róla szó)
+            A fordításhoz szükség van a -lpng kapcsolóra. Ezt először telepíteni kell: <command>sudo apt-get install libpng++-dev</command>
         </para>
-        <para>
-            Megoldás forrása:                
+           <para>
+            A teljes main.cpp: 
         </para>
-        <para>
-            Tanulságok, tapasztalatok, magyarázat...
-        </para>            
+         <programlisting language="c++">
+<![CDATA[ 
+#include <iostream>
+#include "ml.hpp"
+#include <png++/png.hpp>
+
+int main (int argc, char **argv)
+{
+    png::image <png::rgb_pixel> png_image (argv[1]);
+
+    int size = png_image.get_width() * png_image.get_height();
+    
+    Perceptron* p = new Perceptron (3, size, 256, 1);
+    
+    double* image = new double[size];
+    
+    for (int i = 0; i<png_image.get_width(); ++i)
+        for (int j = 0; j<png_image.get_height(); ++j)
+            image[i*png_image.get_width() + j] = png_image[i][j].red;
+    
+    double value = (*p) (image);
+    
+    std::cout << value << std::endl;
+    
+    delete p;
+    delete [] image;
+    
+}
+
+]]>
+         </programlisting>
+         <para>
+             Látható, hogy include-oljuk az m1.hpp-t, illetve alatta található a png.hpp header is.
+             Az elején létrehozunk egy üres png-t, aminek a mérete ugyanakkora, mint a Mandelbrot-halmaz-os képnek.
+             A méretet egy integer típusú változóban tároljuk. Az alatta lévő <function>Perceptron</function> típust az <filename>ml.hpp</filename>-ben találjuk.
+             A következő rész két egymásba ágyazott for ciklust rejt, ami arra jó, hogy a lefoglalt tárunkba belemásolja a <function>Mandel.png</function> pixeleinek red, azaz piros komponensét.
+             Végül kiiratjuk. (megj.: Előfordulhat, hogy nem ugyanazt az értéket adja lefutáskor)
+         </para>
+
+      
     </section>        
         
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         
